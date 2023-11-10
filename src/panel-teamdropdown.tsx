@@ -311,7 +311,9 @@ class PSTeambuilder {
 		if (delimIndex < 0) return [buffer, ''];
 		return [buffer.slice(0, delimIndex), buffer.slice(delimIndex + delimiter.length)];
 	}
-	static parseExportedTeamLine(line: string, isFirstLine: boolean, set: PokemonSet) {
+	static parseExportedTeamLine(
+		line: string, isFirstLine: boolean, set: PokemonSet, format: string | undefined = undefined
+	) {
 		if (isFirstLine) {
 			let item;
 			[line, item] = line.split(' @ ');
@@ -398,11 +400,13 @@ class PSTeambuilder {
 			if (line.startsWith('Hidden Power [')) {
 				const hpType = line.slice(14, -1) as TypeName;
 				line = 'Hidden Power ' + hpType;
-				if (!set.ivs && Dex.types.isName(hpType)) {
-					set.ivs = {hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31};
-					const hpIVs = Dex.types.get(hpType).HPivs || {};
-					for (let stat in hpIVs) {
-						set.ivs[stat as StatName] = hpIVs[stat as StatName]!;
+				if (format && (parseInt(format[3], 10) || 6) < 7) {
+					if (!set.ivs && Dex.types.isName(hpType)) {
+						set.ivs = {hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31};
+						const hpIVs = Dex.types.get(hpType).HPivs || {};
+						for (let stat in hpIVs) {
+							set.ivs[stat as StatName] = hpIVs[stat as StatName]!;
+						}
 					}
 				}
 			}
@@ -504,9 +508,9 @@ class PSTeambuilder {
 					moves: [],
 				};
 				sets.push(curSet);
-				this.parseExportedTeamLine(line, true, curSet);
+				this.parseExportedTeamLine(line, true, curSet, curTeam?.format);
 			} else {
-				this.parseExportedTeamLine(line, false, curSet);
+				this.parseExportedTeamLine(line, false, curSet, curTeam?.format);
 			}
 		}
 		if (curTeam) {

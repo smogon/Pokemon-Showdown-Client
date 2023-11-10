@@ -1181,10 +1181,13 @@ Storage.getPackedTeam = function (team) {
 	return team.team;
 };
 
-Storage.importTeam = function (buffer, teams) {
+Storage.importTeam = function (buffer, teams, format) {
 	var text = buffer.split("\n");
 	var team = teams ? null : [];
 	var curSet = null;
+	if (!format) {
+		format = 'gen9';
+	}
 	if (teams === true) {
 		Storage.teams = [];
 		teams = Storage.teams;
@@ -1198,7 +1201,7 @@ Storage.importTeam = function (buffer, teams) {
 		} else if (line.substr(0, 3) === '===' && teams) {
 			team = [];
 			line = $.trim(line.substr(3, line.length - 6));
-			var format = 'gen9';
+			format = 'gen9';
 			var capacity = 6;
 			var bracketIndex = line.indexOf(']');
 			if (bracketIndex >= 0) {
@@ -1327,11 +1330,13 @@ Storage.importTeam = function (buffer, teams) {
 			if (line.substr(0, 14) === 'Hidden Power [') {
 				var hptype = line.substr(14, line.length - 15);
 				line = 'Hidden Power ' + hptype;
-				var type = Dex.types.get(hptype);
-				if (!curSet.ivs && type) {
-					curSet.ivs = {};
-					for (var stat in type.HPivs) {
-						curSet.ivs[stat] = type.HPivs[stat];
+				if ((parseInt(format[3], 10) || 6) < 7) { // update IVs to match hidden power if format is gen 6 or earlier
+					var type = Dex.types.get(hptype);
+					if (!curSet.ivs && type) {
+						curSet.ivs = {};
+						for (var stat in type.HPivs) {
+							curSet.ivs[stat] = type.HPivs[stat];
+						}
 					}
 				}
 			}
@@ -1440,22 +1445,6 @@ Storage.exportTeam = function (team, gen, hidestats) {
 			if (curSet.ivs) {
 				var defaultIvs = true;
 				var hpType = false;
-				for (var j = 0; j < curSet.moves.length; j++) {
-					var move = curSet.moves[j];
-					if (move.substr(0, 13) === 'Hidden Power ' && move.substr(0, 14) !== 'Hidden Power [') {
-						hpType = move.substr(13);
-						if (!Dex.types.isName(hpType)) {
-							alert(move + " is not a valid Hidden Power type.");
-							continue;
-						}
-						for (var stat in BattleStatNames) {
-							if ((curSet.ivs[stat] === undefined ? 31 : curSet.ivs[stat]) !== (Dex.types.get(hpType).HPivs[stat] || 31)) {
-								defaultIvs = false;
-								break;
-							}
-						}
-					}
-				}
 				if (defaultIvs && !hpType) {
 					for (var stat in BattleStatNames) {
 						if (curSet.ivs[stat] !== 31 && curSet.ivs[stat] !== undefined) {

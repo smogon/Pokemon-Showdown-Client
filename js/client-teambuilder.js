@@ -1396,7 +1396,7 @@
 								self.$('.teamnameedit').val(title).change();
 							}
 
-							Storage.activeSetList = self.curSetList = Storage.importTeam(data.paste);
+							Storage.activeSetList = self.curSetList = Storage.importTeam(data.paste, undefined, format.id);
 						} else {
 							Storage.activeSetList = self.curSetList = Storage.importTeam(data);
 						}
