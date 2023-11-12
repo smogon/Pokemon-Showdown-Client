@@ -1339,7 +1339,7 @@ class BattleTooltips {
 			return `${bullet} ${move.name} <small>(0/${maxpp})</small>`;
 		}
 		if (ppUsed || moveName.charAt(0) === '*') {
-			return `${bullet} ${move.name} <small>(${maxpp - ppUsed}/${maxpp})</small>`;
+			return `${bullet} ${move.name} <small>(${Math.max(maxpp - ppUsed, 0)}/${maxpp})</small>`;
 		}
 		return `${bullet} ${move.name} ${showKnown ? ' <small>(revealed)</small>' : ''}`;
 	}
