@@ -646,7 +646,7 @@ p.or:after {
 	min-height: 100%;
 }
 .mainmenufooter {
-	position: absolute;
+	position: fixed;
 	bottom: 15px;
 	left: 20px;
 	color: #BBBBBB;
