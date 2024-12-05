@@ -760,6 +760,7 @@ details.readmore[open] summary:hover:before {
 	border: 1px solid #7799BB;
 	padding: 2px 4px;
 	border-radius: 4px;
+	overflow-x: auto;
 }
 .dark .infobox {
 	border-color: #506070;
