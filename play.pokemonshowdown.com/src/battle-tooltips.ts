@@ -2517,6 +2517,8 @@ interface PokemonSet {
 	/** Defaults to no ability (error in Gen 3+) */
 	ability?: string;
 	moves: string[];
+	/** Defaults to 3 */
+	movePPUps?: number[];
 	/** Defaults to no nature (error in Gen 3+) */
 	nature?: NatureName;
 	/** Defaults to random legal gender, NOT subject to gender ratios */

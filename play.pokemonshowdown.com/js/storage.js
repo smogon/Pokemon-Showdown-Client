@@ -812,6 +812,20 @@ Storage.packTeam = function (team) {
 			if (moveid.substr(0, 11) === 'hiddenpower' && moveid.length > 11) hasHP = true;
 		}
 
+		// move PP ups
+		if (set.movePPUps) {
+			var PPUps = '';
+			var showPPUps = false;
+			for (var j = 0; j < set.movePPUps.length; j++) {
+				if (j) PPUps += ',';
+				if (set.movePPUps[j] < 3) {
+					PPUps += set.movePPUps[j];
+					showPPUps = true;
+				}
+			}
+			if (showPPUps) buf += ';' + PPUps;
+		}
+
 		// nature
 		buf += '|' + (set.nature || '');
 
@@ -883,7 +897,7 @@ Storage.fastUnpackTeam = function (buf) {
 	if (!buf) return [];
 
 	var team = [];
-	var i = 0, j = 0;
+	var i = 0, j = 0, k = 0;
 
 	while (true) {
 		var set = {};
@@ -913,9 +927,22 @@ Storage.fastUnpackTeam = function (buf) {
 		i = j + 1;
 
 		// moves
-		j = buf.indexOf('|', i);
+		j = buf.indexOf(';', i);
+		k = buf.indexOf('|', i);
+		if (j < 0 || j > k) j = k;
 		set.moves = buf.substring(i, j).split(',');
 		i = j + 1;
+
+		// move PP ups
+		if (buf.charAt(j) === ';') {
+			j = buf.indexOf('|', i);
+			set.movePPUps = buf.substring(i, j).split(',');
+			for (var index = 0; index < set.movePPUps.length; index++) {
+				set.movePPUps[index] = parseInt(set.movePPUps[index], 10);
+				if (!set.movePPUps[index]) set.movePPUps[index] = 3;
+			}
+			i = j + 1;
+		}
 
 		// nature
 		j = buf.indexOf('|', i);
@@ -1000,7 +1027,7 @@ Storage.unpackTeam = function (buf) {
 	if (!buf) return [];
 
 	var team = [];
-	var i = 0, j = 0;
+	var i = 0, j = 0, k = 0;
 
 	while (true) {
 		var set = {};
@@ -1029,11 +1056,28 @@ Storage.unpackTeam = function (buf) {
 		i = j + 1;
 
 		// moves
-		j = buf.indexOf('|', i);
+		j = buf.indexOf(';', i);
+		k = buf.indexOf('|', i);
+		if (j < 0 || j > k) {
+			j = k;
+			if (j < 0) return null;
+		}
 		set.moves = buf.substring(i, j).split(',').map(function (moveid) {
 			return Dex.moves.get(moveid).name;
 		});
 		i = j + 1;
+
+		// move PP ups
+		if (buf.charAt(j) === ';') {
+			j = buf.indexOf('|', i);
+			if (j < 0) return null;
+			set.movePPUps = buf.substring(i, j).split(',');
+			for (var index = 0; index < set.movePPUps.length; index++) {
+				set.movePPUps[index] = parseInt(set.movePPUps[index], 10);
+				if (isNaN(set.movePPUps[index])) set.movePPUps[index] = 3;
+			}
+			i = j + 1;
+		}
 
 		// nature
 		j = buf.indexOf('|', i);
@@ -1344,7 +1388,15 @@ Storage.importTeam = function (buffer, teams) {
 			if (line === 'Frustration' && curSet.happiness === undefined) {
 				curSet.happiness = 0;
 			}
-			curSet.moves.push(line);
+			var moveAndPPUps = line.split(' (PP Ups: ', 2);
+			curSet.moves.push(moveAndPPUps[0]);
+			if (!curSet.movePPUps) curSet.movePPUps = [];
+			if (moveAndPPUps[1]) moveAndPPUps[1] = moveAndPPUps[1].charAt(0);
+			if (isNaN(moveAndPPUps[1])) {
+				curSet.movePPUps.push(3);
+			} else {
+				curSet.movePPUps.push(parseInt(moveAndPPUps[1], 10));
+			}
 		}
 	}
 	if (teams && teams.length && typeof teams[teams.length - 1].team !== 'string') {
@@ -1493,7 +1545,11 @@ Storage.exportTeam = function (team, gen, hidestats) {
 				move = move.substr(0, 13) + '[' + move.substr(13) + ']';
 			}
 			if (move) {
-				text += '- ' + move + "  \n";
+				text += '- ' + move;
+				if (curSet.movePPUps && !isNaN(curSet.movePPUps[j]) && curSet.movePPUps[j] < 3) {
+					text += " (PP Ups: " + curSet.movePPUps[j] + ")";
+				}
+				text += "  \n";
 			}
 		}
 		text += "\n";
