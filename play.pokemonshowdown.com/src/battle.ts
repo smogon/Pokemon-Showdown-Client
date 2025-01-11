@@ -1102,6 +1102,9 @@ export class Battle {
 	endLastTurnPending = false;
 	totalTimeLeft = 0;
 	graceTimeLeft = 0;
+	currTurnTimeElapsed = 0;
+	timerMessageHighlighted = false;
+
 	/**
 	 * true: timer on, state unknown
 	 * false: timer off
@@ -3391,6 +3394,7 @@ export class Battle {
 			break;
 		}
 		case 'turn': {
+			this.currTurnTimeElapsed = 0;
 			this.setTurn(parseInt(args[1], 10));
 			this.log(args);
 			break;
@@ -3494,7 +3498,14 @@ export class Battle {
 				let hasIndex = args[1].indexOf(' has ');
 				let userid = window.app?.user?.get('userid');
 				if (toID(args[1].slice(0, hasIndex)) === userid) {
-					this.kickingInactive = parseInt(args[1].slice(hasIndex + 5), 10) || true;
+					const timerValue = parseInt(args[1].slice(hasIndex + 5), 10) || true;
+					this.kickingInactive = timerValue;
+
+					if (typeof timerValue === "number") {
+						this.timerMessageHighlighted = this.currTurnTimeElapsed >= 30 && timerValue <= 10;
+					}
+				} else {
+					this.timerMessageHighlighted = false;
 				}
 			} else if (args[1].slice(-27) === ' 15 seconds left this turn.') {
 				if (this.isBlitz) return;
@@ -3504,6 +3515,7 @@ export class Battle {
 		}
 		case 'inactiveoff': {
 			this.kickingInactive = false;
+			this.timerMessageHighlighted = false;
 			this.log(args, undefined, preempt);
 			break;
 		}
