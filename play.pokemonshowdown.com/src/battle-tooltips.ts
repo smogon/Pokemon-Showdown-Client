@@ -2656,10 +2656,10 @@ class BattleStatGuesser {
 					}
 					moveCount['Support']++;
 				}
-			} else if (['counter', 'endeavor', 'metalburst', 'mirrorcoat', 'rapidspin'].includes(move.id)) {
+			} else if (['counter', 'endeavor', 'metalburst', 'mirrorcoat', 'rapidspin', 'comeuppance'].includes(move.id)) {
 				moveCount['Support']++;
 			} else if ([
-				'nightshade', 'seismictoss', 'psywave', 'superfang', 'naturesmadness', 'foulplay', 'endeavor', 'finalgambit', 'bodypress',
+				'nightshade', 'seismictoss', 'psywave', 'superfang', 'naturesmadness', 'foulplay', 'endeavor', 'finalgambit', 'bodypress', 'ruination',
 			].includes(move.id)) {
 				moveCount['Offense']++;
 			} else if (move.id === 'fellstinger') {
@@ -2671,7 +2671,7 @@ class BattleStatGuesser {
 				if (move.id === 'knockoff') {
 					moveCount['Support']++;
 				}
-				if (['scald', 'voltswitch', 'uturn', 'flipturn'].includes(move.id)) {
+				if (['scald', 'voltswitch', 'uturn', 'flipturn', 'terablast'].includes(move.id)) {
 					moveCount[move.category] -= 0.2;
 				}
 			}
