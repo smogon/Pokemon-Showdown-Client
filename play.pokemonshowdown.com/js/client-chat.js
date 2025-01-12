@@ -1130,6 +1130,18 @@
 				}
 				return false;
 
+			case 'blitzanims':
+				if (this.checkBroadcast(cmd, text)) return false;
+				var blitzanims = (toID(target) === 'on');
+				Storage.prefs('blitzanims', blitzanims);
+				this.add('Fast animations ' + (blitzanims ? 'ON' : 'OFF') + " for next battle.");
+				for (var roomid in app.rooms) {
+					var battle = app.rooms[roomid] && app.rooms[roomid].battle;
+					if (!battle) continue;
+					battle.resetToCurrentTurn();
+				}
+				return false;
+
 			// documentation of client commands
 			case 'help':
 			case 'h':
@@ -1223,6 +1235,9 @@
 				case 'afd':
 					this.add('/afd - Enable April Fools\' Day sprites.');
 					this.add('/afd disable - Disable April Fools\' Day sprites.');
+					return false;
+				case 'blitzanims':
+					this.add('/blitzanims [on|off] - Enable or disable fast animations.');
 					return false;
 				}
 			}

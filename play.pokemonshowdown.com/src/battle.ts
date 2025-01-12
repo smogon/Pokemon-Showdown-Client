@@ -1034,7 +1034,7 @@ export class Battle {
 	) => void) | null;
 
 	mute = false;
-	messageFadeTime = 300;
+	messageFadeTime = Dex.prefs('blitzanims') === true ? 40 : 300;
 	messageShownTime = 1;
 	/** for tracking when to accelerate animations in long battles full of double switches */
 	turnsSinceMoved = 0;
