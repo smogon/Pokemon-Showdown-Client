@@ -1499,7 +1499,7 @@ class Species implements Effect {
 	readonly isPrimal: boolean;
 	readonly canGigantamax: boolean;
 	readonly cannotDynamax: boolean;
-	readonly forceTeraType: TypeName;
+	readonly requiredTeraType: TypeName;
 	readonly battleOnly: string | string[] | undefined;
 	readonly isNonstandard: string | null;
 	readonly unreleasedHidden: boolean | 'Past';
@@ -1554,7 +1554,7 @@ class Species implements Effect {
 		this.isPrimal = !!(this.forme && this.formeid === '-primal');
 		this.canGigantamax = !!data.canGigantamax;
 		this.cannotDynamax = !!data.cannotDynamax;
-		this.forceTeraType = data.forceTeraType || '';
+		this.requiredTeraType = data.requiredTeraType || '';
 		this.battleOnly = data.battleOnly || (this.isMega ? this.baseSpecies : undefined);
 		this.isNonstandard = data.isNonstandard || null;
 		this.unreleasedHidden = data.unreleasedHidden || false;
