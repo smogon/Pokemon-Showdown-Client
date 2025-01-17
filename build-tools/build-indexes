@@ -480,7 +480,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 					ndDoublesBans[species.id] = 1;
 				}
 				const nd35Pokes = Dex.formats.get(gen + 'nationaldex35pokes');
-				if (nd35Pokes.exists && !Dex.formats.getRuleTable(nd35Pokes).isBannedSpecies(species)) {
+				if (nd35Pokes.exists && nd35Pokes.validateTeam.call({ gen: 0 }, [{ species: species.name }])) {
 					thirtyfivePokes[species.id] = 1;
 				}
 			}
