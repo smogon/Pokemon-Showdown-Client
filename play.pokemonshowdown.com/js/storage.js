@@ -1187,7 +1187,8 @@ Storage.getPackedTeam = function (team) {
 	return team.team;
 };
 
-Storage.importTeam = function (buffer, teams) {
+Storage.importTeam = function (buffer, teams, format) {
+	if (!format) format = 'gen9';
 	var text = buffer.split("\n");
 	var team = teams ? null : [];
 	var curSet = null;
@@ -1204,7 +1205,6 @@ Storage.importTeam = function (buffer, teams) {
 		} else if (line.substr(0, 3) === '===' && teams) {
 			team = [];
 			line = $.trim(line.substr(3, line.length - 6));
-			var format = 'gen9';
 			var capacity = 6;
 			var bracketIndex = line.indexOf(']');
 			if (bracketIndex >= 0) {
@@ -1334,7 +1334,21 @@ Storage.importTeam = function (buffer, teams) {
 				var hptype = line.substr(14, line.length - 15);
 				line = 'Hidden Power ' + hptype;
 				var type = Dex.types.get(hptype);
-				if (!curSet.ivs && type) {
+				var gen = parseInt(format[3], 10);
+				var canHT = false;
+				if (gen >= 7 & format !== 'gen7hiddentype') {
+					if (!curSet.level || curSet.level === 100) {
+						canHT = true;
+					}
+					var formatName = format.substr(0, 3) === 'gen' ? format.substr(4) : format;
+					if (formatName.substr(0, 10) === 'battlespot' || formatName.substr(0, 3) === 'vgc' ||
+						formatName === 'ultrasinnohclassic') {
+						if (curSet.level === 50) {
+							canHT = true;
+						}
+					}
+				}
+				if (!curSet.ivs && type && !canHT) {
 					curSet.ivs = {};
 					for (var stat in type.HPivs) {
 						curSet.ivs[stat] = type.HPivs[stat];
@@ -1673,7 +1687,7 @@ Storage.nwLoadTeamFile = function (filename, localApp) {
 				name: line,
 				format: format,
 				gen: parseInt(format[3], 10) || 6,
-				team: Storage.packTeam(Storage.importTeam('' + data)),
+				team: Storage.packTeam(Storage.importTeam('' + data), false, format),
 				capacity: capacity,
 				folder: folder,
 				iconCache: '',

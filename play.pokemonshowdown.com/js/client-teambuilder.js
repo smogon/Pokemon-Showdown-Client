@@ -1149,19 +1149,11 @@
 				var reader = new FileReader();
 				var self = this;
 				reader.onload = function (e) {
-					var team;
-					try {
-						team = Storage.packTeam(Storage.importTeam(e.target.result));
-					} catch (err) {
-						app.addPopupMessage("Your file is not a valid team.");
-						self.updateTeamList();
-						return;
-					}
 					var name = file.name;
 					if (name.slice(name.length - 4).toLowerCase() === '.txt') {
 						name = name.substr(0, name.length - 4);
 					}
-					var format = '';
+					var format = 'gen9';
 					var bracketIndex = name.indexOf(']');
 					var capacity = 6;
 					if (bracketIndex >= 0) {
@@ -1172,6 +1164,14 @@
 							capacity = 24;
 						}
 						name = $.trim(name.substr(bracketIndex + 1));
+					}
+					var team;
+					try {
+						team = Storage.packTeam(Storage.importTeam(e.target.result), false, format);
+					} catch (err) {
+						app.addPopupMessage("Your file is not a valid team.");
+						self.updateTeamList();
+						return;
 					}
 					Storage.teams.push({
 						name: name,
@@ -1438,9 +1438,9 @@
 								self.$('.teamnameedit').val(title).change();
 							}
 
-							Storage.activeSetList = self.curSetList = Storage.importTeam(data.paste);
+							Storage.activeSetList = self.curSetList = Storage.importTeam(data.paste, false, self.curTeam.format);
 						} else {
-							Storage.activeSetList = self.curSetList = Storage.importTeam(data);
+							Storage.activeSetList = self.curSetList = Storage.importTeam(data, false, self.curTeam.format);
 						}
 						self.$('.teamedit textarea, .teamedit .savebutton').attr('disabled', null);
 						self.back();
@@ -1451,7 +1451,7 @@
 					}
 				});
 			} else {
-				Storage.activeSetList = this.curSetList = Storage.importTeam(text);
+				Storage.activeSetList = this.curSetList = Storage.importTeam(text, false, this.curTeam.format);
 				this.back();
 			}
 		},
@@ -1901,7 +1901,7 @@
 		},
 		savePokemonImport: function (i) {
 			i = +(this.$('li').attr('value'));
-			var curSet = Storage.importTeam(this.$('.pokemonedit').val())[0];
+			var curSet = Storage.importTeam(this.$('.pokemonedit').val(), false, this.curTeam.format)[0];
 			if (curSet) {
 				this.curSet = curSet;
 				this.curSetList[i] = curSet;
@@ -3493,6 +3493,8 @@
 				}
 			}
 
+			var canHT = this.canHyperTrain(set);
+
 			if (!set.ivs) {
 				if (minSpe === undefined && (!minAtk || gen < 3)) return;
 				set.ivs = {};
@@ -3503,7 +3505,7 @@
 				set.ivs['spe'] = (hasHiddenPower ? set.ivs['spe'] % hpModulo : 0);
 			} else if (minSpe === false) {
 				// max Spe
-				set.ivs['spe'] = (hasHiddenPower ? 30 + (set.ivs['spe'] % 2) : 31);
+				set.ivs['spe'] = (hasHiddenPower && !canHT ? 30 + (set.ivs['spe'] % 2) : 31);
 			}
 			if (gen < 3) return;
 			if (!set.ivs['atk'] && set.ivs['atk'] !== 0) set.ivs['atk'] = 31;
@@ -3520,7 +3522,7 @@
 				}
 			} else {
 				// max Atk
-				set.ivs['atk'] = (hasHiddenPower ? 30 + (set.ivs['atk'] % 2) : 31);
+				set.ivs['atk'] = (hasHiddenPower && !canHT ? 30 + (set.ivs['atk'] % 2) : 31);
 			}
 		},
 		setPokemon: function (val, selectNext) {
