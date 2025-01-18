@@ -1753,7 +1753,7 @@
 		addChat: function (name, message, pm, msgTime) {
 			var userid = toUserid(name);
 
-			var speakerHasAuth = !" +\u2606".includes(name.charAt(0));
+			var speakerHasAuth = !" +*\u2606".includes(name.charAt(0));
 			var user = (this.users && this.users[app.user.get('userid')]) || {};
 			var readerHasAuth = !" +\u2606\u203D\u2716!".includes(user.group || ' ');
 			if (app.ignore[userid] && !speakerHasAuth && !readerHasAuth) {
