@@ -521,14 +521,8 @@ if (!$user) {
 				<th width="55" style="text-align:center"><abbr title="Elo rating">Elo</abbr></th>
 				<th width="50" style="text-align:center"><abbr title="user's percentage chance of winning a random battle (aka GLIXARE)">GXE</abbr></th>
 				<th width="80" style="text-align:center"><abbr title="Glicko-1 rating: rating&#177;deviation">Glicko-1</abbr></th>
-<?php
-			if ($user['userid'] === $curuser['userid']) {
-?>
 				<th width="20" style="text-align:center"><abbr title="Wins">W</abbr></th>
 				<th width="20" style="text-align:center"><abbr title="Losses">L</abbr></th>
-<?php
-			}
-?>
 			</tr>
 <?php
 			echo $bufs['official'];
@@ -540,14 +534,8 @@ if (!$user) {
 				<th width="55" style="text-align:center"><abbr title="Elo rating">Elo</abbr></th>
 				<th width="50" style="text-align:center"><abbr title="user's percentage chance of winning a random battle (aka GLIXARE)">GXE</abbr></th>
 				<th width="80" style="text-align:center"><abbr title="Glicko-1 rating: rating&#177;deviation">Glicko-1</abbr></th>
-<?php
-			if ($user['userid'] === $curuser['userid']) {
-?>
 				<th width="20" style="text-align:center"><abbr title="Wins">W</abbr></th>
 				<th width="20" style="text-align:center"><abbr title="Losses">L</abbr></th>
-<?php
-			}
-?>
 			</tr>
 <?php
 			echo $bufs['unofficial'];
