@@ -471,7 +471,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			tierTable[tier].push(id);
 
 			if (genNum === 9) {
-				const ubersUU = Dex.formats.get(gen + 'ubersuu');
+				const ubersUU = Dex.formats.get(gen + (isNatDex ? 'nationaldex' : '') + 'ubersuu');
 				if (ubersUU.exists && Dex.formats.getRuleTable(ubersUU).isBannedSpecies(species)) {
 					ubersUUBans[species.id] = 1;
 				}
@@ -514,6 +514,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			BattleTeambuilderTable['gen' + genNum + 'natdex'].overrideTier = overrideTier;
 			BattleTeambuilderTable['gen' + genNum + 'natdex'].items = items;
 			BattleTeambuilderTable['gen' + genNum + 'natdex'].ndDoublesBans = ndDoublesBans;
+			BattleTeambuilderTable['gen' + genNum + 'natdex'].ubersUUBans = ubersUUBans;
 			BattleTeambuilderTable['gen' + genNum + 'natdex'].monotypeBans = monotypeBans;
 			BattleTeambuilderTable['gen' + genNum + 'natdex'].formatSlices = formatSlices;
 			if (isNatDex && genNum === 9) {
