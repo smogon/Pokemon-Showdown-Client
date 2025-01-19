@@ -865,49 +865,50 @@
 						targets[i] = targets[i].replace(/\n/g, '').trim();
 					}
 					switch (subCmd) {
-					case 'add': case 'roomadd':
-						var key = subCmd === 'roomadd' ? (Config.server.id + '#' + this.id) : 'global';
-						var highlightList = highlights[key] || [];
-						for (var i = 0, len = targets.length; i < len; i++) {
-							if (!targets[i]) continue;
-							if (/[\\^$*+?()|{}[\]]/.test(targets[i])) {
-								// Catch any errors thrown by newly added regular expressions so they don't break the entire highlight list
-								try {
-									new RegExp(targets[i]);
-								} catch (e) {
-									return this.add('|error|' + (e.message.substr(0, 28) === 'Invalid regular expression: ' ? e.message : 'Invalid regular expression: /' + targets[i] + '/: ' + e.message));
+						case 'add': case 'roomadd':
+							var key = subCmd === 'roomadd' ? (Config.server.id + '#' + this.id) : 'global';
+							var highlightList = highlights[key] || [];
+							for (var i = 0, len = targets.length; i < len; i++) {
+								if (!targets[i]) continue;
+								if (/[\\^$*+?()|{}[\]]/.test(targets[i])) {
+									// Catch any errors thrown by newly added regular expressions so they don't break the entire highlight list
+									try {
+										new RegExp(targets[i]);
+									} catch (e) {
+										return this.add('|error|' + (e.message.substr(0, 28) === 'Invalid regular expression: ' ? e.message : 'Invalid regular expression: /' + targets[i] + '/: ' + e.message));
+									}
+								}
+								if (highlightList.includes(targets[i])) {
+									return this.add('|error|' + targets[i] + ' is already on your highlights list.');
 								}
 							}
-							if (highlightList.includes(targets[i])) {
-								return this.add('|error|' + targets[i] + ' is already on your highlights list.');
+							highlights[key] = highlightList.concat(targets);
+							this.add("Now highlighting on " + (key === 'global' ? "(everywhere): " : "(in " + key + "): ") + highlights[key].join(', '));
+							// We update the regex
+							this.updateHighlightRegExp(highlights);
+							break;
+						case 'delete': case 'roomdelete':
+						case 'remove': case 'roomremove': // New aliases
+							var key = subCmd === 'roomdelete' || subCmd === 'roomremove' ? (Config.server.id + '#' + this.id) : 'global';
+							var highlightList = highlights[key] || [];
+							var newHls = [];
+							for (var i = 0, len = highlightList.length; i < len; i++) {
+								if (targets.indexOf(highlightList[i]) === -1) {
+									newHls.push(highlightList[i]);
+								}
 							}
-						}
-						highlights[key] = highlightList.concat(targets);
-						this.add("Now highlighting on " + (key === 'global' ? "(everywhere): " : "(in " + key + "): ") + highlights[key].join(', '));
-						// We update the regex
-						this.updateHighlightRegExp(highlights);
-						break;
-					case 'delete': case 'roomdelete':
-						var key = subCmd === 'roomdelete' ? (Config.server.id + '#' + this.id) : 'global';
-						var highlightList = highlights[key] || [];
-						var newHls = [];
-						for (var i = 0, len = highlightList.length; i < len; i++) {
-							if (targets.indexOf(highlightList[i]) === -1) {
-								newHls.push(highlightList[i]);
-							}
-						}
-						highlights[key] = newHls;
-						this.add("Now highlighting on " + (key === 'global' ? "(everywhere): " : "(in " + key + "): ") + highlights[key].join(', '));
-						// We update the regex
-						this.updateHighlightRegExp(highlights);
-						break;
-					default:
-						if (this.checkBroadcast(cmd, text)) return false;
-						// Wrong command
-						this.add('|error|Invalid /highlight command.');
-						this.parseCommand('/help highlight'); // show help
-						return false;
-					}
+							highlights[key] = newHls;
+							this.add("Now highlighting on " + (key === 'global' ? "(everywhere): " : "(in " + key + "): ") + highlights[key].join(', '));
+							// We update the regex
+							this.updateHighlightRegExp(highlights);
+							break;
+						default:
+							if (this.checkBroadcast(cmd, text)) return false;
+							// Wrong command
+							this.add('|error|Invalid /highlight command.');
+							this.parseCommand('/help highlight'); // show help
+							return false;
+					}	
 					Storage.prefs('highlights', highlights);
 				} else {
 					if (this.checkBroadcast(cmd, text)) return false;
